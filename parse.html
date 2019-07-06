@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <script>
+      // [
+      //    { type: 'paren',  value: '('        },
+      //   { type: 'name',   value: 'add'      },
+      //   { type: 'number', value: '2'        },
+      //   { type: 'paren',  value: '('        },
+      //   { type: 'name',   value: 'subtract' },
+      //   { type: 'number', value: '4'        },
+      //  { type: 'number', value: '2'        },
+      //   { type: 'paren',  value: ')'        },
+      //  { type: 'paren',  value: ')'        }
+      // ] 
+      function isNum(inputNum) {
+        let regNum = /[0-9]/;
+        if (regNum.test(inputNum)) {
+          return true
+        }
+        return false
+      }
+      
+      function isLetter(inputLetter) {
+        let regLetter = /[a-z]/i;
+        if (regLetter.test(inputLetter)) {
+          return true
+        }
+        return false
+      }
+      
+      function isTab(inputTab) {
+        let regTab = /\s/;
+        if (regTab.test(inputTab)) {
+          return true
+        }
+        return false
+      }
+      function tokenp(inputStr){
+        let current = 0;
+        let tokens = [];
+        while (current < inputStr.length) {
+         
+          if (inputStr[current] == '(') {
+            tokens.push({
+              type: 'paren',
+              value: '('
+            })
+            current++
+             continue;
+          }
+          if (inputStr[current] == ')') {
+            tokens.push({
+              type: 'paren',
+              value: ')'
+            })
+            current++
+            continue;
+          }
+          if (isTab(inputStr[current])) {
+            current++
+            continue;
+          }
+          if (isNum(inputStr[current])) {
+            let numS = "";
+            numS += inputStr[current];
+            current++
+            while (isNum(inputStr[current])) {
+              numS += inputStr[current];
+              current++
+            }
+            
+            tokens.push({
+              type: 'number',
+              value: numS
+            })
+             continue;
+          }
+          if (isLetter(inputStr[current])) {
+            let letterS = "";
+            letterS += inputStr[current];
+            current++
+            while (isLetter(inputStr[current])) {
+              letterS += inputStr[current];
+              current++
+            }
+            tokens.push({
+              type: 'name',
+              value: letterS
+            })
+             continue;
+          }
+          throw new TypeError('I dont11 know what this character is: ' + inputStr[current]);
+         
+        }
+        return tokens
+      }
+      function parser(tokens){
+        
+        var current=0;
+        let ast={
+          type:'Program',
+          body:[]
+        }
+        function walk(){
+        
+          if(tokens[current].type==='number'){
+           
+            current++
+            return {                
+              type: 'NumberLiteral',    
+              value: tokens[current-1].value               
+            }
+          }
+          if(tokens[current].type==='paren'&&tokens[current].value==='('){
+             
+            current++
+            let node={
+              type: 'CallExpression',    
+              name: tokens[current].value,
+              params:[]
+            }   
+            current++
+            while( (tokens[current].type !== 'paren') ||(tokens[current].type==='paren'&&tokens[current].value!==')')){
+              node.params.push(walk())
+            }
+            current++
+   
+            return node
+          }
+          throw new TypeError(tokens[current].type);
+        }
+        while (current < tokens.length) {
+       
+          ast.body.push(walk());
+          console.log(current)
+        }
+        
+        return ast
+      }
+      function traver(ast,visitor){
+        function traverseArr(array,parent){
+          
+        }
+      }
+      var a="(add 22 (subtract 4 2))"
+      console.log(parser(tokenp(a)))
+    </script>
+  </body>
+</html>
